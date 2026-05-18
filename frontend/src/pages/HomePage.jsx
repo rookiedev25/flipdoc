@@ -1,18 +1,64 @@
 import { Link } from 'react-router-dom'
+import { useState, useEffect } from "react";
+
+const DOC_TYPES = [".docx", ".pdf", ".ppt", ".txt", ".html"];
 
 export default function HomePage() {
+  const [displayText, setDisplayText] = useState("Word");
+  const [wordIndex, setWordIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const currentWord = DOC_TYPES[wordIndex];
+    let delay;
+
+    if (!isDeleting) {
+      if (displayText.length < currentWord.length) {
+        delay = setTimeout(
+          () => setDisplayText(currentWord.slice(0, displayText.length + 1)),
+          100,
+        );
+      } else {
+        delay = setTimeout(() => setIsDeleting(true), 1400);
+      }
+    } else {
+      if (displayText.length > 0) {
+        delay = setTimeout(() => setDisplayText(displayText.slice(0, -1)), 55);
+      } else {
+        setIsDeleting(false);
+        setWordIndex((prev) => (prev + 1) % DOC_TYPES.length);
+      }
+    }
+
+    return () => clearTimeout(delay);
+  }, [displayText, isDeleting, wordIndex]);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="w-full bg-white py-20 sm:py-32 lg:py-40 flex items-center justify-center">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-xs font-semibold uppercase tracking-widest text-light-gray mb-4">
-            Converts DOCX to Markdown
+            Convert any document to Markdown
           </p>
           <h1 className="text-5xl sm:text-6xl lg:text-8xl font-bold text-primary mb-6 sm:mb-8 leading-tight tracking-tight">
-            Word to Markdown.
-            <br />
-            Simplified.
+            <span className="block">
+              {displayText}
+              <span
+                className="cursor-blink"
+                style={{
+                  display: "inline-block",
+                  width: "2px",
+                  height: "0.85em",
+                  backgroundColor: "currentColor",
+                  marginLeft: "3px",
+                  verticalAlign: "-0.15em",
+                  borderRadius: "1px",
+                }}
+              />{" "}
+              to Markdown.
+            </span>
+            <span className="block">Simplified.</span>
           </h1>
           <p className="text-lg sm:text-xl lg:text-2xl text-light-gray mb-8 sm:mb-12 max-w-3xl mx-auto font-light leading-relaxed">
             Upload your document. Download clean Markdown, extracted images, and
@@ -23,14 +69,18 @@ export default function HomePage() {
               to="/upload"
               className="px-8 py-3 bg-primary text-white rounded-full font-semibold hover:opacity-90 transition-opacity text-base sm:text-lg"
             >
-              Get Started
+              Convert Now
             </Link>
-            <a
-              href="#how-it-works"
-              className="px-8 py-3 border border-primary text-primary rounded-full font-semibold hover:bg-primary hover:text-white transition-colors text-base sm:text-lg"
+            <button
+              onClick={() =>
+                document
+                  .getElementById("how-it-works")
+                  .scrollIntoView({ behavior: "smooth" })
+              }
+              className="px-8 py-3 border border-primary text-primary rounded-full font-semibold hover:bg-black hover:bg-opacity-5 transition-colors text-base sm:text-lg"
             >
               Learn More
-            </a>
+            </button>
           </div>
         </div>
       </section>
@@ -44,17 +94,18 @@ export default function HomePage() {
                 Conversion
               </p>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-primary mb-5 leading-tight">
-                Word to
+                Any Format,
                 <br />
-                Markdown
+                One Output
               </h2>
               <p className="text-base sm:text-lg text-light-gray mb-8 font-light leading-relaxed">
-                Transform your Word documents into clean, publication-ready
-                Markdown files instantly.
+                Upload Word docs, PDFs, PowerPoint slides, plain text, or HTML —
+                FlipDoc converts them all into clean, publication-ready Markdown
+                instantly.
               </p>
               <ul className="space-y-3 mb-8">
                 {[
-                  "Supports .docx format",
+                  "Supports .docx, .pdf, .ppt, .txt, .html",
                   "Extracts all images automatically",
                   "Cleans formatting artifacts",
                   "Handles documents up to 50MB",
@@ -77,72 +128,98 @@ export default function HomePage() {
             </div>
             <div className="hidden md:block">
               <div className="bg-white rounded-3xl p-8 shadow-sm border border-black border-opacity-5 max-w-sm mx-auto">
-                <div className="flex items-center justify-between mb-5">
-                  <span className="text-xs font-semibold uppercase tracking-widest text-light-gray">
-                    Conversion Preview
-                  </span>
-                  <span className="text-xs text-light-gray">
-                    manual_v2.docx
-                  </span>
-                </div>
-                {/* Simulated document body */}
-                <div className="bg-bg-light rounded-2xl p-4 mb-5">
-                  <div className="space-y-2">
-                    <div className="h-2 bg-primary rounded-full w-full opacity-20" />
-                    <div className="h-2 bg-primary rounded-full w-4/5 opacity-20" />
-                    <div className="h-2 bg-primary rounded-full w-full opacity-20" />
-                    {/* Highlighted image block */}
-                    <div className="h-14 bg-primary bg-opacity-5 border border-primary border-opacity-15 rounded-xl my-3 flex items-center justify-center gap-2">
-                      <svg
-                        className="w-4 h-4 text-primary opacity-40"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={1.5}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
-                      <span className="text-xs text-primary opacity-50 font-medium">
-                        Figure 2.1
-                      </span>
-                    </div>
-                    <div className="h-2 bg-primary rounded-full w-3/4 opacity-20" />
-                    <div className="h-2 bg-primary rounded-full w-full opacity-20" />
-                    {/* Highlighted code block */}
-                    <div className="mt-3 border border-primary border-opacity-15 rounded-lg overflow-hidden font-mono text-xs p-2 bg-white">
-                      <span className="text-primary opacity-60">
-                        # Heading 1
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                {/* Conversion stats */}
-                <div className="space-y-3">
+                <p className="text-xs font-semibold uppercase tracking-widest text-light-gray mb-6">
+                  Supported Inputs
+                </p>
+                {/* Input format tiles */}
+                <div className="grid grid-cols-2 gap-3 mb-6">
                   {[
-                    { label: "Sections", count: "12" },
-                    { label: "Images", count: "8" },
-                    { label: "Headings", count: "24" },
-                  ].map(({ label, count }) => (
+                    {
+                      ext: ".docx",
+                      label: "Word",
+                      color: "bg-blue-50 border-blue-100 text-blue-700",
+                    },
+                    {
+                      ext: ".pdf",
+                      label: "PDF",
+                      color: "bg-red-50 border-red-100 text-red-700",
+                    },
+                    {
+                      ext: ".ppt",
+                      label: "PowerPoint",
+                      color: "bg-orange-50 border-orange-100 text-orange-700",
+                    },
+                    {
+                      ext: ".txt",
+                      label: "Plain Text",
+                      color: "bg-green-50 border-green-100 text-green-700",
+                    },
+                    {
+                      ext: ".html",
+                      label: "HTML",
+                      color: "bg-purple-50 border-purple-100 text-purple-700",
+                    },
+                  ].map(({ ext, label, color }) => (
                     <div
-                      key={label}
-                      className="flex items-center justify-between"
+                      key={ext}
+                      className={`flex items-center gap-2.5 px-3 py-3 rounded-xl border ${color}`}
                     >
-                      <span className="text-sm font-medium text-primary">
+                      <span className="text-base font-bold">{ext}</span>
+                      <span className="text-xs font-medium opacity-70">
                         {label}
-                      </span>
-                      <span className="text-sm text-light-gray">
-                        {count} extracted
                       </span>
                     </div>
                   ))}
                 </div>
-                <div className="mt-5 pt-4 border-t border-black border-opacity-5">
+                {/* Arrow + output */}
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="flex-1 border-t border-dashed border-black border-opacity-15" />
+                  <div className="flex items-center gap-1.5 text-xs text-light-gray font-medium">
+                    <svg
+                      className="w-3.5 h-3.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M17 8l4 4m0 0l-4 4m4-4H3"
+                      />
+                    </svg>
+                    converts to
+                  </div>
+                  <div className="flex-1 border-t border-dashed border-black border-opacity-15" />
+                </div>
+                {/* Output tile */}
+                <div className="flex items-center gap-3 px-4 py-3.5 bg-primary rounded-xl mb-5">
+                  <span className="text-sm font-bold text-white">.md</span>
+                  <div className="flex-1">
+                    <p className="text-white text-xs font-medium">
+                      Clean Markdown
+                    </p>
+                    <p className="text-white text-opacity-60 text-xs opacity-60">
+                      Sections · Images · Metadata
+                    </p>
+                  </div>
+                  <svg
+                    className="w-4 h-4 text-white opacity-70"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                </div>
+                <div className="pt-4 border-t border-black border-opacity-5">
                   <p className="text-xs text-light-gray">
-                    Conversion complete · 2.4 MB
+                    All formats · Same clean output
                   </p>
                 </div>
               </div>
@@ -206,7 +283,7 @@ export default function HomePage() {
                     Output Preview
                   </span>
                   <span className="text-xs text-light-gray">
-                    technical_manual.docx
+                    presentation.pptx
                   </span>
                 </div>
                 <div className="font-mono text-xs bg-bg-light rounded-xl p-4 mb-4 space-y-1">
@@ -286,8 +363,8 @@ export default function HomePage() {
                 Upload
               </h3>
               <p className="text-sm text-light-gray leading-relaxed">
-                Drop your Word document (.docx) and select your conversion
-                options.
+                Drop any supported file — .docx, .pdf, .ppt, .txt, or .html —
+                and select your conversion options.
               </p>
             </div>
             <div>
@@ -325,8 +402,8 @@ export default function HomePage() {
             Ready to convert?
           </h2>
           <p className="text-lg text-light-gray mb-8 max-w-xl mx-auto">
-            Transform your Word documents into clean Markdown in seconds. No
-            sign-up required.
+            Transform any document into clean Markdown in seconds. No sign-up
+            required.
           </p>
           <Link
             to="/upload"

@@ -49,13 +49,13 @@ export default function LoginPage() {
         {/* Header */}
         <div className="text-center mb-16">
           <div className="text-5xl mb-4">📝</div>
-          <h1 className="text-4xl font-semibold text-primary">Claro</h1>
+          <h1 className="text-4xl font-semibold text-primary">FlipDoc</h1>
           <p className="text-lg text-light-gray mt-3">
             Sign in to verify documents
           </p>
         </div>
 
-        {step === 'email' ? (
+        {step === "email" ? (
           // Email Form
           <form onSubmit={handleSendOTP} className="space-y-6">
             <div>
@@ -83,7 +83,7 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full px-4 py-4 bg-primary text-white rounded-full font-semibold hover:bg-dark-gray disabled:bg-medium-gray transition-colors text-lg"
             >
-              {loading ? 'Sending...' : 'Send Code'}
+              {loading ? "Sending..." : "Send Code"}
             </button>
 
             <div className="text-center text-base text-light-gray">
@@ -119,14 +119,14 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full px-4 py-4 bg-primary text-white rounded-full font-semibold hover:bg-dark-gray disabled:bg-medium-gray transition-colors text-lg"
             >
-              {loading ? 'Verifying...' : 'Sign In'}
+              {loading ? "Verifying..." : "Sign In"}
             </button>
 
             <button
               type="button"
               onClick={() => {
-                setStep('email')
-                setError('')
+                setStep("email");
+                setError("");
               }}
               className="w-full text-base text-primary hover:underline font-medium"
             >
@@ -145,7 +145,7 @@ export default function LoginPage() {
         {/* Info */}
         <div className="text-center">
           <p className="text-base text-light-gray mb-6">
-            New to Claro? An account will be created automatically.
+            New to FlipDoc? An account will be created automatically.
           </p>
           <Link
             to="/"
@@ -156,5 +156,5 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

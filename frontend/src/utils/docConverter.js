@@ -2,6 +2,7 @@ import mammoth from 'mammoth'
 import TurndownService from 'turndown'
 import JSZip from 'jszip'
 import yaml from 'js-yaml'
+import { postProcess } from "./markdownPostProcessor";
 
 /**
  * Document Converter Utility
@@ -69,7 +70,10 @@ export async function convertDocument(file, onProgress = () => {}) {
 
     // Step 3: Clean the Markdown
     await animateProgress(onProgress, 'cleaning', 45, 50, 'Cleaning formatting...', 100)
-    result.cleanedMarkdown = cleanMarkdown(result.markdown, images.length)
+    result.cleanedMarkdown = postProcess(
+      result.markdown,
+      file.name,
+    ).cleanedMarkdown;
     await animateProgress(onProgress, 'cleaning', 50, 65, 'Formatting complete...', 200)
 
     // Step 4: Parse headings and generate YAML

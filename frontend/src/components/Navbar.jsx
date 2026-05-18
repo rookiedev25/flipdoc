@@ -14,7 +14,10 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const navLinks = [{ to: "/upload", label: "Convert" }];
+  const navLinks = [
+    { to: "/dashboard", label: "History" },
+    { to: "/upload", label: "Convert" },
+  ];
 
   return (
     <nav
@@ -65,14 +68,22 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Right — CTA button */}
+          {/* Right — Ask AI teaser */}
           <div className="hidden sm:flex items-center shrink-0">
-            <Link
-              to="/upload"
-              className="px-4 py-1.5 bg-primary text-white rounded-full text-sm font-medium hover:bg-dark-gray transition-colors"
-            >
-              Get Started
-            </Link>
+            <div className="relative group">
+              <button
+                disabled
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium text-light-gray border border-black border-opacity-10 cursor-not-allowed select-none"
+              >
+                <span className="text-xs">✦</span>
+                Ask AI
+              </button>
+              {/* Tooltip */}
+              <div className="absolute right-0 top-full mt-2 px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-full whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                In progress — coming soon
+                <div className="absolute -top-1 right-4 w-2 h-2 bg-primary rotate-45" />
+              </div>
+            </div>
           </div>
 
           {/* Mobile Hamburger */}

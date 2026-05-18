@@ -2,10 +2,56 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useConversion } from "../context/ConversionContext";
 
+const FORMAT_INFO = {
+  docx: {
+    label: ".docx",
+    color: "bg-blue-50 text-blue-700 border-blue-100",
+    name: "Word",
+  },
+  doc: {
+    label: ".doc",
+    color: "bg-blue-50 text-blue-700 border-blue-100",
+    name: "Word",
+  },
+  pdf: {
+    label: ".pdf",
+    color: "bg-red-50 text-red-700 border-red-100",
+    name: "PDF",
+  },
+  ppt: {
+    label: ".ppt",
+    color: "bg-orange-50 text-orange-700 border-orange-100",
+    name: "PowerPoint",
+  },
+  pptx: {
+    label: ".pptx",
+    color: "bg-orange-50 text-orange-700 border-orange-100",
+    name: "PowerPoint",
+  },
+  txt: {
+    label: ".txt",
+    color: "bg-green-50 text-green-700 border-green-100",
+    name: "Plain Text",
+  },
+  html: {
+    label: ".html",
+    color: "bg-purple-50 text-purple-700 border-purple-100",
+    name: "HTML",
+  },
+};
+
+const SUPPORTED_EXTS = Object.keys(FORMAT_INFO);
+
 export default function UploadPage() {
   const [dragActive, setDragActive] = useState(false);
   const { file, options, setFile, setOptions, status } = useConversion();
   const navigate = useNavigate();
+
+  const getFormatInfo = (fileName) => {
+    if (!fileName) return null;
+    const ext = fileName.split(".").pop().toLowerCase();
+    return FORMAT_INFO[ext] || null;
+  };
 
   const conversionOptions = [
     {
@@ -36,22 +82,16 @@ export default function UploadPage() {
   const validateAndSetFile = (selectedFile) => {
     if (!selectedFile) return;
 
-    // Validate file size (max 50MB)
     if (selectedFile.size > 50 * 1024 * 1024) {
       alert("File size exceeds 50MB limit");
       return;
     }
 
-    // Only accept DOCX files (mammoth.js limitation)
-    const validTypes = [
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    ];
-    const isDocx =
-      validTypes.includes(selectedFile.type) ||
-      selectedFile.name.endsWith(".docx");
-
-    if (!isDocx) {
-      alert("Please upload a Word document (.docx)");
+    const ext = selectedFile.name.split(".").pop().toLowerCase();
+    if (!SUPPORTED_EXTS.includes(ext)) {
+      alert(
+        "Unsupported format. Please upload a .docx, .pdf, .ppt, .pptx, or .txt file.",
+      );
       return;
     }
 
@@ -104,7 +144,7 @@ export default function UploadPage() {
             Convert
           </h1>
           <p className="text-sm sm:text-base text-light-gray">
-            Upload your Word document to convert to Markdown
+            Upload your document — format is detected automatically
           </p>
         </div>
 
@@ -130,7 +170,7 @@ export default function UploadPage() {
                 onChange={handleFileChange}
                 className="hidden"
                 id="file-input"
-                accept=".docx"
+                accept=".docx,.doc,.pdf,.ppt,.pptx,.txt,.html"
               />
               <label
                 htmlFor="file-input"
@@ -147,6 +187,16 @@ export default function UploadPage() {
                         {formatFileSize(file.size)}
                       </p>
                     </div>
+                    {(() => {
+                      const fmt = getFormatInfo(file.name);
+                      return fmt ? (
+                        <span
+                          className={`px-3 py-1 rounded-full border text-xs font-semibold ${fmt.color}`}
+                        >
+                          {fmt.label} · {fmt.name}
+                        </span>
+                      ) : null;
+                    })()}
                     <p className="text-xs sm:text-sm text-primary underline">
                       Click to change file
                     </p>
@@ -163,7 +213,7 @@ export default function UploadPage() {
                       </p>
                     </div>
                     <p className="text-xs sm:text-sm text-light-gray">
-                      Word documents (.docx) up to 50MB
+                      .docx · .pdf · .ppt · .txt · .html — up to 50MB
                     </p>
                   </>
                 )}

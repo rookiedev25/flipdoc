@@ -27,7 +27,7 @@ export default function Footer() {
 
           {/* Tagline */}
           <p className="text-sm text-light-gray">
-            Word to Markdown, simplified.
+            Any format to Markdown, simplified.
           </p>
 
           {/* Copyright */}

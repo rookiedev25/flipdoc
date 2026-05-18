@@ -1,7 +1,47 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useConversion } from "../context/ConversionContext";
-import { convertDocument } from "../utils/docConverter";
+import { convertDocument as convertDocx } from "../utils/docConverter";
+import { convertDocument as convertPdf } from "../utils/pdfConverter";
+import { convertDocument as convertPpt } from "../utils/pptConverter";
+import { convertDocument as convertTxt } from "../utils/txtConverter";
+import { convertDocument as convertHtml } from "../utils/htmlConverter";
+
+const STORAGE_KEY = "flipdoc_conversions";
+
+function getConverter(file) {
+  const ext = file.name.split(".").pop().toLowerCase();
+  if (ext === "pdf") return convertPdf;
+  if (ext === "ppt" || ext === "pptx") return convertPpt;
+  if (ext === "txt") return convertTxt;
+  if (ext === "html") return convertHtml;
+  return convertDocx;
+}
+
+function saveToHistory(file, result) {
+  try {
+    const markdownBytes = result.markdown
+      ? new Blob([result.markdown]).size
+      : 0;
+    const entry = {
+      id: `conv_${Date.now()}`,
+      fileName: file.name,
+      convertedAt: new Date().toISOString(),
+      stats: {
+        images: result.stats?.totalImages ?? 0,
+        headings: result.stats?.totalHeadings ?? 0,
+        tables: result.stats?.totalTables ?? 0,
+        wordCount: result.stats?.wordCount ?? 0,
+      },
+      markdownSize:
+        markdownBytes > 0 ? `${(markdownBytes / 1024).toFixed(1)} KB` : "—",
+    };
+    const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([entry, ...existing]));
+  } catch (e) {
+    console.warn("Could not save to history:", e);
+  }
+}
 
 export default function ProcessingPage() {
   const navigate = useNavigate();
@@ -31,14 +71,13 @@ export default function ProcessingPage() {
 
     const runConversion = async () => {
       try {
-        const result = await convertDocument(
-          file,
-          (step, percentage, message) => {
-            updateProgress(step, percentage, message);
-          },
-        );
+        const convert = getConverter(file);
+        const result = await convert(file, (step, percentage, message) => {
+          updateProgress(step, percentage, message);
+        });
 
         setResult(result);
+        saveToHistory(file, result);
 
         // Small delay for UX before navigating
         setTimeout(() => {
