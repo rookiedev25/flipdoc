@@ -1,42 +1,42 @@
-# DocParseConvo Frontend
+# FlipDoc Frontend
 
-A modern React application for document parsing and verification.
+A browser-based DOCX to Markdown conversion tool for Technical Writers.
 
 ## Features
 
-- 📄 **Document Upload** - Upload PDF and Word documents
-- 🤖 **Multiple Bot Selection** - Choose which verification bots to run
-- ⏳ **Real-time Processing** - Watch progress as your document is analyzed
-- 📊 **Detailed Results** - View violations with severity levels and recommendations
-- 📁 **Dashboard** - Track all your document analyses
-- 🔐 **Email-OTP Authentication** - Secure login with one-time passwords
+- 📄 **Drag & Drop Upload** — Upload DOCX files with drag-and-drop or file picker
+- 🔄 **Client-Side Conversion** — All processing happens in browser, no server needed
+- 🖼️ **Image Extraction** — Automatically extracts embedded images
+- ✨ **Clean Markdown** — Removes Word artifacts for readable output
+- 📋 **YAML Metadata** — Generates structured TOC from headings
+- 📑 **Section Splitting** — Splits document by headings into separate files
+- 📦 **ZIP Download** — Download all outputs as a single archive
 
 ## Tech Stack
 
 - **Framework**: React 18 with Vite
 - **Styling**: Tailwind CSS
 - **Routing**: React Router v6
-- **HTTP Client**: Axios
-- **Build Tool**: Vite
+- **Conversion**: mammoth.js, turndown.js
+- **Bundling**: JSZip, file-saver
+- **Metadata**: js-yaml
 
 ## Project Structure
 
 ```
 src/
 ├── components/
-│   ├── Navbar.jsx
-│   └── Footer.jsx
+│   ├── Navbar.jsx        # Navigation with FlipDoc branding
+│   └── Footer.jsx        # Simple footer
+├── context/
+│   └── ConversionContext.jsx  # Conversion state management
 ├── pages/
-│   ├── HomePage.jsx
-│   ├── UploadPage.jsx
-│   ├── ProcessingPage.jsx
-│   ├── ResultsPage.jsx
-│   ├── DashboardPage.jsx
-│   └── LoginPage.jsx
-├── hooks/
-│   └── (custom React hooks)
+│   ├── HomePage.jsx      # Landing page
+│   ├── UploadPage.jsx    # File upload with drag-drop
+│   ├── ProcessingPage.jsx # Conversion progress
+│   └── ResultsPage.jsx   # Preview & download
 ├── utils/
-│   └── (utility functions)
+│   └── docConverter.js   # Core conversion logic
 ├── App.jsx
 ├── main.jsx
 └── index.css
@@ -45,27 +45,30 @@ src/
 ## Pages
 
 ### HomePage
-Landing page with features overview and CTA buttons
+Landing page with hero section and feature highlights.
 
 ### UploadPage
-Document upload form with bot selection
+Drag-and-drop DOCX upload with file validation (50MB max, DOCX only).
 
 ### ProcessingPage
-Shows real-time progress while document is being analyzed
+Shows smooth animated progress through conversion steps:
+- Extracting content
+- Converting to Markdown
+- Cleaning formatting
+- Generating metadata
+- Splitting sections
 
 ### ResultsPage
-Displays detailed analysis results with violations and recommendations
-
-### DashboardPage
-Shows history of all uploaded documents and their status
-
-### LoginPage
-Email-OTP based authentication
+Preview and download converted content:
+- **Markdown tab** — Full converted document with copy button
+- **Sections tab** — Individual section files
+- **Images tab** — Extracted images gallery
+- **Download** — ZIP archive with all outputs
 
 ## Getting Started
 
 ### Prerequisites
-- Node.js 16+
+- Node.js 18+
 - npm or yarn
 
 ### Installation
@@ -81,7 +84,7 @@ npm install
 npm run dev
 ```
 
-Server runs at `http://localhost:3000`
+Server runs at `http://localhost:5173`
 
 ### Build
 
@@ -95,23 +98,31 @@ npm run build
 npm run preview
 ```
 
-## Environment Variables
+## Conversion Pipeline
 
-Create a `.env` file in the root:
+All conversion happens client-side using:
+
+1. **mammoth.js** — Extracts HTML and images from DOCX
+2. **turndown.js** — Converts HTML to Markdown
+3. **Custom cleaning** — Removes Word artifacts
+4. **js-yaml** — Generates TOC metadata
+5. **JSZip** — Bundles output as ZIP
+
+## Output Structure
 
 ```
-VITE_API_URL=http://localhost:3001/api
+download.zip
+├── output.md          # Full converted Markdown
+├── toc.yml            # Table of contents metadata
+├── sections/          # Split by headings
+│   ├── introduction.md
+│   ├── getting-started.md
+│   └── ...
+└── media/             # Extracted images
+    ├── image1.png
+    ├── image2.png
+    └── ...
 ```
-
-## API Integration Points
-
-The following pages connect to backend APIs:
-
-1. **UploadPage** - `POST /api/upload` - Upload document
-2. **ProcessingPage** - `GET /api/jobs/:jobId/status` - Check processing status
-3. **ResultsPage** - `GET /api/results/:jobId` - Fetch analysis results
-4. **DashboardPage** - `GET /api/jobs` - Fetch user's job history
-5. **LoginPage** - `POST /api/auth/send-otp` & `POST /api/auth/verify-otp` - Authentication
 
 ## Design Specifications
 
