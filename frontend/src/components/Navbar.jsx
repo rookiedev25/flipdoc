@@ -14,23 +14,38 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const navLinks = [
-    { to: '/upload', label: 'Upload' },
-    { to: '/dashboard', label: 'Dashboard' },
-  ]
+  const navLinks = [{ to: "/upload", label: "Convert" }];
 
   return (
-    <nav className={`sticky top-0 z-50 transition-all duration-300 ${
-      scrolled
-        ? 'bg-white/90 backdrop-blur-xl shadow-sm'
-        : 'bg-white/75 backdrop-blur-xl'
-    } border-b border-black border-opacity-5`}>
+    <nav
+      className={`sticky top-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? "bg-white/90 backdrop-blur-xl shadow-sm"
+          : "bg-white/75 backdrop-blur-xl"
+      } border-b border-black border-opacity-5`}
+    >
       <div className="max-w-screen-xl mx-auto px-6 lg:px-10">
         <div className="flex items-center justify-between h-14">
-
           {/* Wordmark — left */}
-          <Link to="/" className="shrink-0">
-            <span className="text-base font-semibold text-primary tracking-tight">Claro</span>
+          <Link to="/" className="shrink-0 flex items-center gap-2">
+            <div className="w-7 h-7 bg-primary rounded-lg flex items-center justify-center">
+              <svg
+                className="w-3.5 h-3.5 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                />
+              </svg>
+            </div>
+            <span className="text-base font-semibold text-primary tracking-tight">
+              FlipDoc
+            </span>
           </Link>
 
           {/* Center links — desktop */}
@@ -41,8 +56,8 @@ export default function Navbar() {
                 to={to}
                 className={`px-4 py-1.5 text-sm font-medium rounded-full transition-colors ${
                   isActive(to)
-                    ? 'text-primary bg-black bg-opacity-5'
-                    : 'text-light-gray hover:text-primary'
+                    ? "text-primary bg-black bg-opacity-5"
+                    : "text-light-gray hover:text-primary"
                 }`}
               >
                 {label}
@@ -50,13 +65,13 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Right — Sign In (outline) */}
+          {/* Right — CTA button */}
           <div className="hidden sm:flex items-center shrink-0">
             <Link
-              to="/login"
-              className="px-4 py-1.5 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary hover:text-white transition-colors"
+              to="/upload"
+              className="px-4 py-1.5 bg-primary text-white rounded-full text-sm font-medium hover:bg-dark-gray transition-colors"
             >
-              Sign In
+              Get Started
             </Link>
           </div>
 
@@ -66,9 +81,15 @@ export default function Navbar() {
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
           >
-            <span className={`block w-5 h-0.5 bg-primary transition-all duration-200 ${menuOpen ? 'rotate-45 translate-y-2' : ''}`} />
-            <span className={`block w-5 h-0.5 bg-primary transition-all duration-200 ${menuOpen ? 'opacity-0' : ''}`} />
-            <span className={`block w-5 h-0.5 bg-primary transition-all duration-200 ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+            <span
+              className={`block w-5 h-0.5 bg-primary transition-all duration-200 ${menuOpen ? "rotate-45 translate-y-2" : ""}`}
+            />
+            <span
+              className={`block w-5 h-0.5 bg-primary transition-all duration-200 ${menuOpen ? "opacity-0" : ""}`}
+            />
+            <span
+              className={`block w-5 h-0.5 bg-primary transition-all duration-200 ${menuOpen ? "-rotate-45 -translate-y-2" : ""}`}
+            />
           </button>
         </div>
       </div>
@@ -88,15 +109,15 @@ export default function Navbar() {
           ))}
           <div className="pt-3 mt-1 border-t border-black border-opacity-5">
             <Link
-              to="/login"
+              to="/upload"
               onClick={() => setMenuOpen(false)}
-              className="block px-5 py-3 border border-primary text-primary rounded-full text-center text-sm font-medium hover:bg-primary hover:text-white transition-colors"
+              className="block px-5 py-3 bg-primary text-white rounded-full text-center text-sm font-medium hover:bg-dark-gray transition-colors"
             >
-              Sign In
+              Get Started
             </Link>
           </div>
         </div>
       )}
     </nav>
-  )
+  );
 }
