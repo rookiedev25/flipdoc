@@ -1,91 +1,68 @@
 import { useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { Link, useNavigate } from "react-router-dom";
+import { useConversion } from "../context/ConversionContext";
+import { createDownloadZip, downloadZip } from "../utils/docConverter";
 
 export default function ResultsPage() {
-  const { jobId } = useParams()
-  const [activeTab, setActiveTab] = useState('graphics')
+  const navigate = useNavigate();
+  const { file, result, reset, status } = useConversion();
+  const [activeTab, setActiveTab] = useState("preview");
+  const [downloading, setDownloading] = useState(false);
+  const [copiedSection, setCopiedSection] = useState(null);
 
-  // Mock results data
-  const results = {
-    graphics: {
-      status: 'completed',
-      violations: [
-        {
-          id: 1,
-          severity: 'high',
-          type: 'Image Resolution',
-          description: 'Image on page 3 has low resolution (72 DPI)',
-          page: 3,
-          recommendation: 'Replace with image that has minimum 300 DPI',
-        },
-        {
-          id: 2,
-          severity: 'medium',
-          type: 'Missing Alt Text',
-          description: 'Figure 2.1 is missing alternative text',
-          page: 5,
-          recommendation: 'Add descriptive alt text for accessibility',
-        },
-        {
-          id: 3,
-          severity: 'low',
-          type: 'Image Alignment',
-          description: 'Image on page 8 is not properly centered',
-          page: 8,
-          recommendation: 'Align image to match document formatting standards',
-        },
-      ],
-      score: 75,
-    },
-    grammar: {
-      status: 'completed',
-      violations: [
-        {
-          id: 1,
-          severity: 'medium',
-          type: 'Subject-Verb Agreement',
-          description: 'Line 42: "The data are" should be "The data is"',
-          page: 2,
-          recommendation: 'Check subject-verb agreement',
-        },
-      ],
-      score: 92,
-    },
-    editorial: {
-      status: 'completed',
-      violations: [
-        {
-          id: 1,
-          severity: 'low',
-          type: 'Inconsistent Terminology',
-          description: 'Document uses both "user" and "end-user" inconsistently',
-          page: 'Multiple',
-          recommendation: 'Choose one term and use it consistently',
-        },
-      ],
-      score: 88,
-    },
+  // Redirect if no result
+  if (status !== "completed" || !result) {
+    return (
+      <div className="min-h-screen bg-bg-light flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg text-light-gray mb-4">
+            No conversion results found
+          </p>
+          <Link
+            to="/upload"
+            className="px-6 py-2 bg-primary text-white rounded-full hover:bg-dark-gray transition-colors"
+          >
+            Upload a Document
+          </Link>
+        </div>
+      </div>
+    );
   }
 
-  const getSeverityColor = (severity) => {
-    switch (severity) {
-      case 'high': return 'bg-red-50 border-red-200'
-      case 'medium': return 'bg-amber-50 border-amber-200'
-      case 'low': return 'bg-green-50 border-green-200'
-      default: return 'bg-bg-light border-gray-200'
+  const handleDownloadZip = async () => {
+    setDownloading(true);
+    try {
+      const blob = await createDownloadZip(result, file.name);
+      const zipFilename = file.name.replace(/\.[^/.]+$/, "") + "_converted.zip";
+      downloadZip(blob, zipFilename);
+    } catch (error) {
+      console.error("Download error:", error);
+      alert("Error creating download. Please try again.");
     }
-  }
+    setDownloading(false);
+  };
 
-  const getSeverityBadge = (severity) => {
-    switch (severity) {
-      case 'high': return 'bg-red-100 text-red-700'
-      case 'medium': return 'bg-amber-100 text-amber-700'
-      case 'low': return 'bg-green-100 text-green-700'
-      default: return 'bg-gray-100 text-gray-500'
+  const handleCopyToClipboard = async (content, sectionId) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopiedSection(sectionId);
+      setTimeout(() => setCopiedSection(null), 2000);
+    } catch (error) {
+      console.error("Copy error:", error);
     }
-  }
+  };
 
-  const currentResults = results[activeTab]
+  const handleNewConversion = () => {
+    reset();
+    navigate("/upload");
+  };
+
+  const tabs = [
+    { id: "preview", label: "Markdown Preview", emoji: "📄" },
+    { id: "sections", label: "Sections", emoji: "📑" },
+    { id: "metadata", label: "Metadata", emoji: "📋" },
+    { id: "images", label: "Images", emoji: "🖼️" },
+  ];
 
   return (
     <div className="min-h-screen bg-bg-light py-8 sm:py-12">
@@ -93,140 +70,272 @@ export default function ResultsPage() {
         {/* Header */}
         <div className="mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-primary mb-2">
-            Analysis Results
+            Conversion Complete
           </h1>
-          <p className="text-sm sm:text-base text-light-gray">Job ID: {jobId}</p>
+          <p className="text-sm sm:text-base text-light-gray">{file?.name}</p>
           <div className="mt-4 flex gap-3 flex-wrap">
-            <Link
-              to="/upload"
-              className="px-4 py-2 bg-primary text-white rounded-full hover:bg-dark-gray transition-colors text-sm"
+            <button
+              onClick={handleDownloadZip}
+              disabled={downloading}
+              className="px-5 py-2 bg-primary text-white rounded-full hover:bg-dark-gray disabled:bg-medium-gray transition-colors text-sm font-medium flex items-center gap-2"
             >
-              Upload Another
-            </Link>
-            <button className="px-4 py-2 border border-primary text-primary rounded-full hover:bg-bg-light transition-colors text-sm">
-              Download Report
+              {downloading ? (
+                <>
+                  <span className="animate-spin">⏳</span> Preparing...
+                </>
+              ) : (
+                <>📥 Download All (ZIP)</>
+              )}
+            </button>
+            <button
+              onClick={handleNewConversion}
+              className="px-5 py-2 border border-primary text-primary rounded-full hover:bg-white transition-colors text-sm font-medium"
+            >
+              Convert Another
             </button>
           </div>
         </div>
 
-        {/* Score Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {Object.entries(results).map(([key, data]) => (
-            <div
-              key={key}
-              className="bg-white rounded-lg shadow p-6 border-l-4 border-primary cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={() => setActiveTab(key)}
-            >
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="text-lg font-semibold text-primary capitalize">
-                  {key === 'graphics' && '🖼️'}
-                  {key === 'grammar' && '✍️'}
-                  {key === 'editorial' && '📋'} {key} Check
-                </h3>
-                <div className="text-3xl font-bold text-primary">
-                  {data.score}%
-                </div>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-primary h-2 rounded-full"
-                  style={{ width: `${data.score}%` }}
-                />
-              </div>
-              <p className="text-sm text-light-gray mt-3">
-                {data.violations.length} issues found
-              </p>
-            </div>
-          ))}
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white rounded-xl shadow-sm p-4 border-l-4 border-primary">
+            <p className="text-xs uppercase tracking-wider text-light-gray mb-1">
+              Sections
+            </p>
+            <p className="text-2xl font-bold text-primary">
+              {result.stats.totalSections}
+            </p>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm p-4 border-l-4 border-primary">
+            <p className="text-xs uppercase tracking-wider text-light-gray mb-1">
+              Headings
+            </p>
+            <p className="text-2xl font-bold text-primary">
+              {result.stats.totalHeadings}
+            </p>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm p-4 border-l-4 border-primary">
+            <p className="text-xs uppercase tracking-wider text-light-gray mb-1">
+              Images
+            </p>
+            <p className="text-2xl font-bold text-primary">
+              {result.stats.totalImages}
+            </p>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm p-4 border-l-4 border-green-500">
+            <p className="text-xs uppercase tracking-wider text-light-gray mb-1">
+              Status
+            </p>
+            <p className="text-lg font-bold text-green-600">✓ Ready</p>
+          </div>
         </div>
 
-        {/* Detailed Results */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="border-b border-medium-gray">
-            <div className="flex">
-              {Object.keys(results).map((key) => (
+        {/* Tabbed Content */}
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          {/* Tab Headers */}
+          <div className="border-b border-medium-gray border-opacity-20">
+            <div className="flex overflow-x-auto">
+              {tabs.map((tab) => (
                 <button
-                  key={key}
-                  onClick={() => setActiveTab(key)}
-                  className={`flex-1 px-6 py-4 font-semibold text-center transition-colors capitalize ${
-                    activeTab === key
-                      ? 'border-b-2 border-primary text-primary'
-                      : 'text-light-gray hover:text-primary'
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex-shrink-0 px-6 py-4 font-medium text-sm transition-colors whitespace-nowrap ${
+                    activeTab === tab.id
+                      ? "border-b-2 border-primary text-primary bg-primary bg-opacity-5"
+                      : "text-light-gray hover:text-primary"
                   }`}
                 >
-                  {key === 'graphics' && '🖼️'} {key}
+                  {tab.emoji} {tab.label}
                 </button>
               ))}
             </div>
           </div>
 
+          {/* Tab Content */}
           <div className="p-6">
-            {currentResults.violations.length > 0 ? (
-              <div className="space-y-4">
-                {currentResults.violations.map((violation) => (
-                  <div
-                    key={violation.id}
-                    className={`border rounded-lg p-4 ${getSeverityColor(
-                      violation.severity
-                    )}`}
+            {/* Preview Tab */}
+            {activeTab === "preview" && (
+              <div>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-semibold text-primary">
+                    Converted Markdown
+                  </h3>
+                  <button
+                    onClick={() =>
+                      handleCopyToClipboard(result.cleanedMarkdown, "preview")
+                    }
+                    className="px-3 py-1 text-xs border border-medium-gray rounded-full hover:bg-bg-light transition-colors"
                   >
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-semibold text-gray-900">
-                            {violation.type}
-                          </h4>
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs font-semibold ${getSeverityBadge(
-                              violation.severity
-                            )}`}
-                          >
-                            {violation.severity.toUpperCase()}
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          {violation.description}
-                        </p>
-                      </div>
-                      <div className="text-right text-sm font-semibold">
-                        Page {violation.page}
-                      </div>
-                    </div>
-                    <div className="mt-3 pt-3 border-t border-black border-opacity-10">
-                      <p className="text-sm font-semibold text-gray-700">
-                        Recommendation
-                      </p>
-                      <p className="text-sm mt-1 text-gray-600">{violation.recommendation}</p>
-                    </div>
-                  </div>
-                ))}
+                    {copiedSection === "preview" ? "✓ Copied!" : "📋 Copy"}
+                  </button>
+                </div>
+                <div className="bg-bg-light rounded-xl p-4 overflow-auto max-h-[500px]">
+                  <pre className="text-sm text-gray-800 whitespace-pre-wrap font-mono">
+                    {result.cleanedMarkdown}
+                  </pre>
+                </div>
               </div>
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-lg text-light-gray">✅ No issues found!</p>
+            )}
+
+            {/* Sections Tab */}
+            {activeTab === "sections" && (
+              <div>
+                <h3 className="font-semibold text-primary mb-4">
+                  Split Sections ({result.splitDocs.length} files)
+                </h3>
+                <div className="space-y-3">
+                  {result.splitDocs.map((doc, index) => (
+                    <div
+                      key={index}
+                      className="border border-medium-gray border-opacity-20 rounded-xl overflow-hidden"
+                    >
+                      <div className="flex items-center justify-between px-4 py-3 bg-bg-light">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">📄</span>
+                          <div>
+                            <p className="font-medium text-primary text-sm">
+                              {doc.filename}
+                            </p>
+                            <p className="text-xs text-light-gray">
+                              {doc.heading}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() =>
+                            handleCopyToClipboard(
+                              doc.content,
+                              `section-${index}`,
+                            )
+                          }
+                          className="px-3 py-1 text-xs border border-medium-gray rounded-full hover:bg-white transition-colors"
+                        >
+                          {copiedSection === `section-${index}`
+                            ? "✓ Copied!"
+                            : "📋 Copy"}
+                        </button>
+                      </div>
+                      <details className="group">
+                        <summary className="px-4 py-2 text-xs text-primary cursor-pointer hover:bg-primary hover:bg-opacity-5">
+                          Preview content →
+                        </summary>
+                        <div className="px-4 py-3 bg-white border-t border-medium-gray border-opacity-10">
+                          <pre className="text-xs text-gray-700 whitespace-pre-wrap font-mono max-h-40 overflow-auto">
+                            {doc.content.substring(0, 500)}
+                            {doc.content.length > 500 && "..."}
+                          </pre>
+                        </div>
+                      </details>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Metadata Tab */}
+            {activeTab === "metadata" && (
+              <div>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-semibold text-primary">mkdocs.yml</h3>
+                  <button
+                    onClick={() =>
+                      handleCopyToClipboard(result.yamlContent, "yaml")
+                    }
+                    className="px-3 py-1 text-xs border border-medium-gray rounded-full hover:bg-bg-light transition-colors"
+                  >
+                    {copiedSection === "yaml" ? "✓ Copied!" : "📋 Copy"}
+                  </button>
+                </div>
+                <div className="bg-bg-light rounded-xl p-4 overflow-auto max-h-[500px]">
+                  <pre className="text-sm text-gray-800 whitespace-pre-wrap font-mono">
+                    {result.yamlContent}
+                  </pre>
+                </div>
+                <p className="mt-3 text-xs text-light-gray">
+                  💡 Tip: Update the placeholder values (ENTER_*,
+                  &lt;PRODUCT_NAME&gt;, etc.) with your actual metadata.
+                </p>
+              </div>
+            )}
+
+            {/* Images Tab */}
+            {activeTab === "images" && (
+              <div>
+                <h3 className="font-semibold text-primary mb-4">
+                  Extracted Images ({result.images.length})
+                </h3>
+                {result.images.length > 0 ? (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    {result.images.map((img, index) => (
+                      <div
+                        key={index}
+                        className="border border-medium-gray border-opacity-20 rounded-xl overflow-hidden bg-bg-light"
+                      >
+                        <div className="aspect-square flex items-center justify-center p-2">
+                          <img
+                            src={`data:${img.contentType};base64,${img.data}`}
+                            alt={img.filename}
+                            className="max-w-full max-h-full object-contain rounded"
+                          />
+                        </div>
+                        <div className="px-3 py-2 bg-white border-t border-medium-gray border-opacity-10">
+                          <p className="text-xs font-medium text-primary truncate">
+                            {img.filename}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 bg-bg-light rounded-xl">
+                    <span className="text-4xl mb-3 block">🖼️</span>
+                    <p className="text-light-gray">
+                      No images found in document
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>
         </div>
 
-        {/* Export Section */}
-        <div className="mt-6 sm:mt-8 bg-white rounded-lg shadow p-4 sm:p-6 text-center">
-          <h3 className="text-base sm:text-lg font-semibold text-primary mb-3 sm:mb-4">
-            Export Results
+        {/* Download Section */}
+        <div className="mt-8 bg-white rounded-xl shadow-sm p-6">
+          <h3 className="text-lg font-semibold text-primary mb-4 text-center">
+            Download Package Contents
           </h3>
-          <div className="flex gap-3 justify-center flex-wrap">
-            <button className="px-4 sm:px-6 py-2 bg-primary text-white rounded-full hover:bg-dark-gray transition-colors text-sm">
-              📥 PDF Report
-            </button>
-            <button className="px-4 sm:px-6 py-2 border border-primary text-primary rounded-full hover:bg-bg-light transition-colors text-sm">
-              📊 CSV
-            </button>
-            <button className="px-4 sm:px-6 py-2 border border-medium-gray text-primary rounded-full hover:bg-bg-light transition-colors text-sm">
-              📋 Copy Text
+          <div className="bg-bg-light rounded-xl p-4 font-mono text-sm">
+            <div className="text-light-gray mb-2">
+              📁 {file?.name.replace(/\.[^/.]+$/, "")}_converted.zip
+            </div>
+            <div className="pl-4 space-y-1 text-gray-700">
+              <div>├── 📄 {file?.name.replace(/\.[^/.]+$/, "")}.md</div>
+              <div>├── 📄 mkdocs.yml</div>
+              <div>├── 📁 docs/</div>
+              <div className="pl-4 text-light-gray">
+                │ └── {result.splitDocs.length} section files
+              </div>
+              {result.images.length > 0 && (
+                <>
+                  <div>└── 📁 media/</div>
+                  <div className="pl-4 text-light-gray">
+                    └── {result.images.length} images
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+          <div className="mt-4 text-center">
+            <button
+              onClick={handleDownloadZip}
+              disabled={downloading}
+              className="px-8 py-3 bg-primary text-white rounded-full hover:bg-dark-gray disabled:bg-medium-gray transition-colors font-medium"
+            >
+              {downloading ? "Preparing Download..." : "📥 Download ZIP"}
             </button>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
