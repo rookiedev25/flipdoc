@@ -1,174 +1,99 @@
-# FlipDoc Frontend
+# FlipDoc
 
-A browser-based DOCX to Markdown conversion tool for Technical Writers.
+**Word to Markdown. Simplified.**
+
+FlipDoc is a browser-based document conversion utility that transforms DOCX files into clean, well-formatted Markdown — all client-side, no server required.
+
+![FlipDoc](https://img.shields.io/badge/React-18-blue) ![Vite](https://img.shields.io/badge/Vite-4-purple) ![License](https://img.shields.io/badge/License-MIT-green)
 
 ## Features
 
-- 📄 **Drag & Drop Upload** — Upload DOCX files with drag-and-drop or file picker
-- 🔄 **Client-Side Conversion** — All processing happens in browser, no server needed
-- 🖼️ **Image Extraction** — Automatically extracts embedded images
-- ✨ **Clean Markdown** — Removes Word artifacts for readable output
-- 📋 **YAML Metadata** — Generates structured TOC from headings
-- 📑 **Section Splitting** — Splits document by headings into separate files
-- 📦 **ZIP Download** — Download all outputs as a single archive
+- **Drag & Drop Upload** — Simply drag your DOCX file or click to browse
+- **Client-Side Conversion** — All processing happens in your browser, no data leaves your machine
+- **Image Extraction** — Automatically extracts and preserves embedded images
+- **Clean Markdown** — Removes Word artifacts and produces clean, readable Markdown
+- **YAML Metadata** — Generates structured metadata from document headings
+- **Section Splitting** — Splits documents by headings into separate files
+- **ZIP Download** — Download everything as a single ZIP archive
 
 ## Tech Stack
 
-- **Framework**: React 18 with Vite
-- **Styling**: Tailwind CSS
-- **Routing**: React Router v6
-- **Conversion**: mammoth.js, turndown.js
-- **Bundling**: JSZip, file-saver
-- **Metadata**: js-yaml
-
-## Project Structure
-
-```
-src/
-├── components/
-│   ├── Navbar.jsx        # Navigation with FlipDoc branding
-│   └── Footer.jsx        # Simple footer
-├── context/
-│   └── ConversionContext.jsx  # Conversion state management
-├── pages/
-│   ├── HomePage.jsx      # Landing page
-│   ├── UploadPage.jsx    # File upload with drag-drop
-│   ├── ProcessingPage.jsx # Conversion progress
-│   └── ResultsPage.jsx   # Preview & download
-├── utils/
-│   └── docConverter.js   # Core conversion logic
-├── App.jsx
-├── main.jsx
-└── index.css
-```
-
-## Pages
-
-### HomePage
-Landing page with hero section and feature highlights.
-
-### UploadPage
-Drag-and-drop DOCX upload with file validation (50MB max, DOCX only).
-
-### ProcessingPage
-Shows smooth animated progress through conversion steps:
-- Extracting content
-- Converting to Markdown
-- Cleaning formatting
-- Generating metadata
-- Splitting sections
-
-### ResultsPage
-Preview and download converted content:
-- **Markdown tab** — Full converted document with copy button
-- **Sections tab** — Individual section files
-- **Images tab** — Extracted images gallery
-- **Download** — ZIP archive with all outputs
+- **React 18** — UI framework
+- **Vite** — Build tool
+- **Tailwind CSS** — Styling
+- **mammoth.js** — DOCX to HTML conversion
+- **turndown.js** — HTML to Markdown conversion
+- **JSZip** — ZIP file creation
+- **js-yaml** — YAML generation
 
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - npm or yarn
 
 ### Installation
 
 ```bash
-cd frontend
+# Clone the repository
+git clone https://github.com/rookiedev25/docParserSolution.git
+cd docParserSolution/frontend
+
+# Install dependencies
 npm install
-```
 
-### Development
-
-```bash
+# Start development server
 npm run dev
 ```
 
-Server runs at `http://localhost:5173`
+The app will be available at `http://localhost:5173`
 
-### Build
+### Build for Production
 
 ```bash
 npm run build
-```
-
-### Preview Production Build
-
-```bash
 npm run preview
 ```
 
-## Conversion Pipeline
+## Usage
 
-All conversion happens client-side using:
+1. **Upload** — Drag and drop a DOCX file or click to browse
+2. **Convert** — Watch the smooth progress as your document is processed
+3. **Preview** — Review the generated Markdown, sections, and extracted images
+4. **Download** — Get everything as a ZIP file containing:
+   - `output.md` — Full converted Markdown
+   - `toc.yml` — Table of contents metadata
+   - `sections/` — Individual section files
+   - `media/` — Extracted images
 
-1. **mammoth.js** — Extracts HTML and images from DOCX
-2. **turndown.js** — Converts HTML to Markdown
-3. **Custom cleaning** — Removes Word artifacts
-4. **js-yaml** — Generates TOC metadata
-5. **JSZip** — Bundles output as ZIP
-
-## Output Structure
+## Project Structure
 
 ```
-download.zip
-├── output.md          # Full converted Markdown
-├── toc.yml            # Table of contents metadata
-├── sections/          # Split by headings
-│   ├── introduction.md
-│   ├── getting-started.md
-│   └── ...
-└── media/             # Extracted images
-    ├── image1.png
-    ├── image2.png
-    └── ...
+frontend/
+├── src/
+│   ├── components/     # Reusable UI components
+│   │   ├── Navbar.jsx
+│   │   └── Footer.jsx
+│   ├── context/        # React context providers
+│   │   └── ConversionContext.jsx
+│   ├── pages/          # Page components
+│   │   ├── HomePage.jsx
+│   │   ├── UploadPage.jsx
+│   │   ├── ProcessingPage.jsx
+│   │   └── ResultsPage.jsx
+│   ├── utils/          # Utility functions
+│   │   └── docConverter.js
+│   └── App.jsx
+├── index.html
+├── tailwind.config.js
+└── vite.config.js
 ```
-
-## Design Specifications
-
-- **Primary Color**: `#0066cc` (Blue)
-- **Design Approach**: Minimal, clean, professional
-- **Responsive**: Mobile-first design
-- **Accessibility**: WCAG compliant
-
-## Key Components
-
-### Navbar
-- Logo and navigation
-- Links to Upload, Dashboard, Login
-
-### Footer
-- Company info
-- Links to documentation and legal pages
-
-### File Upload
-- Drag-and-drop support
-- File validation (type and size)
-- Bot selection checkboxes
-
-### Progress Indicator
-- Real-time progress animation
-- Status updates
-- Job ID reference
-
-### Results Display
-- Tabbed interface for different bot results
-- Severity-based color coding
-- Recommendations for each violation
-- Export options (PDF, CSV)
-
-## Future Enhancements
-
-- [ ] Real-time WebSocket updates
-- [ ] Batch processing
-- [ ] Result sharing with team members
-- [ ] Custom report templates
-- [ ] Integration with document management systems
 
 ## License
 
-Internal - Company Use Only
+MIT
 
-## Support
+---
 
-For issues or questions, contact the development team.
+Built with ❤️ for Technical Writers
