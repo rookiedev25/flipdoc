@@ -36,51 +36,229 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="w-full bg-white py-20 sm:py-32 lg:py-40 flex items-center justify-center">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-xs font-semibold uppercase tracking-widest text-light-gray mb-4">
-            Convert any document to Markdown
-          </p>
-          <h1 className="text-5xl sm:text-6xl lg:text-8xl font-bold text-primary mb-6 sm:mb-8 leading-tight tracking-tight">
-            <span className="block">
-              {displayText}
-              <span
-                className="cursor-blink"
-                style={{
-                  display: "inline-block",
-                  width: "2px",
-                  height: "0.85em",
-                  backgroundColor: "currentColor",
-                  marginLeft: "3px",
-                  verticalAlign: "-0.15em",
-                  borderRadius: "1px",
-                }}
-              />{" "}
-              to Markdown.
-            </span>
-            <span className="block">Simplified.</span>
-          </h1>
-          <p className="text-lg sm:text-xl lg:text-2xl text-light-gray mb-8 sm:mb-12 max-w-3xl mx-auto font-light leading-relaxed">
-            Upload your document. Download clean Markdown, extracted images, and
-            ready-to-use metadata.
-          </p>
-          <div className="flex gap-4 justify-center flex-wrap">
-            <Link
-              to="/upload"
-              className="px-8 py-3 bg-primary text-white rounded-full font-semibold hover:opacity-90 transition-opacity text-base sm:text-lg"
+      <section className="relative w-full overflow-hidden py-16 sm:py-24 lg:py-32">
+        {/* Gradient Background - Monochromatic */}
+        <div className="absolute inset-0 bg-gradient-to-br from-bg-light via-white to-gray-100" />
+
+        {/* Floating Document Icons - Professional SVGs */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* DOC Icon */}
+          <div
+            className="absolute top-20 left-[10%] opacity-10 animate-bounce"
+            style={{ animationDuration: "3s" }}
+          >
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              className="text-gray-800"
             >
-              Convert Now
-            </Link>
-            <button
-              onClick={() =>
-                document
-                  .getElementById("how-it-works")
-                  .scrollIntoView({ behavior: "smooth" })
-              }
-              className="px-8 py-3 border border-primary text-primary rounded-full font-semibold hover:bg-black hover:bg-opacity-5 transition-colors text-base sm:text-lg"
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14,2 14,8 20,8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <line x1="10" y1="9" x2="8" y2="9" />
+            </svg>
+          </div>
+          {/* PDF Icon */}
+          <div
+            className="absolute top-32 right-[15%] opacity-10 animate-bounce"
+            style={{ animationDuration: "4s", animationDelay: "1s" }}
+          >
+            <svg
+              width="40"
+              height="40"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              className="text-gray-800"
             >
-              Learn More
-            </button>
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14,2 14,8 20,8" />
+              <path d="M9 15v-2h1.5a1.5 1.5 0 0 1 0 3H9z" />
+            </svg>
+          </div>
+          {/* Code/MD Icon */}
+          <div
+            className="absolute bottom-24 left-[20%] opacity-10 animate-bounce"
+            style={{ animationDuration: "3.5s", animationDelay: "0.5s" }}
+          >
+            <svg
+              width="40"
+              height="40"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              className="text-gray-800"
+            >
+              <polyline points="16,18 22,12 16,6" />
+              <polyline points="8,6 2,12 8,18" />
+            </svg>
+          </div>
+          {/* Markdown Icon */}
+          <div
+            className="absolute bottom-32 right-[10%] opacity-10 animate-bounce"
+            style={{ animationDuration: "4.5s", animationDelay: "1.5s" }}
+          >
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              className="text-gray-800"
+            >
+              <rect x="3" y="5" width="18" height="14" rx="2" />
+              <path d="M7 15V9l2.5 3L12 9v6" />
+              <path d="M17 13l-2-2v4" />
+            </svg>
+          </div>
+        </div>
+
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left: Text Content */}
+            <div className="text-center lg:text-left">
+              <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-4">
+                Document Conversion Tool
+              </p>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-primary mb-6 leading-tight tracking-tight">
+                <span className="block">
+                  <span className="inline-block">
+                    {displayText}
+                    <span
+                      className="cursor-blink"
+                      style={{
+                        display: "inline-block",
+                        width: "3px",
+                        height: "0.85em",
+                        backgroundColor: "#0066cc",
+                        marginLeft: "4px",
+                        verticalAlign: "-0.1em",
+                        borderRadius: "2px",
+                      }}
+                    />
+                  </span>
+                </span>
+                <span className="block">to Markdown.</span>
+                <span className="block text-light-gray">Simplified.</span>
+              </h1>
+              <p className="text-lg text-light-gray mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+                Upload your document. Download clean Markdown, extracted images,
+                and ready-to-use metadata — all in your browser.
+              </p>
+              <div className="flex gap-4 justify-center lg:justify-start flex-wrap">
+                <Link
+                  to="/upload"
+                  className="px-8 py-3.5 bg-gray-900 text-white rounded-full font-semibold hover:scale-105 active:scale-95 transition-transform duration-150 text-base cursor-pointer"
+                >
+                  Start Converting
+                </Link>
+                <button
+                  onClick={() =>
+                    document
+                      .getElementById("how-it-works")
+                      .scrollIntoView({ behavior: "smooth" })
+                  }
+                  className="px-8 py-3.5 border-2 border-gray-900 text-gray-900 rounded-full font-semibold hover:scale-105 active:scale-95 transition-transform duration-150 text-base cursor-pointer"
+                >
+                  See How It Works
+                </button>
+              </div>
+            </div>
+
+            {/* Right: Visual Demo */}
+            <div className="hidden lg:block">
+              <div className="relative">
+                {/* Conversion Flow Visual */}
+                <div className="flex items-center justify-center gap-6">
+                  {/* Source Documents - Stacked */}
+                  <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 transform hover:scale-105 transition-transform">
+                    <div className="w-32 h-40 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex flex-col items-center justify-center text-white relative overflow-hidden">
+                      <svg
+                        className="w-10 h-10 mb-2"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4z" />
+                      </svg>
+                      <div className="flex flex-wrap justify-center gap-1 text-[10px] font-medium">
+                        <span className="bg-white/20 px-1.5 py-0.5 rounded">
+                          .docx
+                        </span>
+                        <span className="bg-white/20 px-1.5 py-0.5 rounded">
+                          .pdf
+                        </span>
+                        <span className="bg-white/20 px-1.5 py-0.5 rounded">
+                          .html
+                        </span>
+                        <span className="bg-white/20 px-1.5 py-0.5 rounded">
+                          .txt
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-center text-xs text-light-gray mt-3">
+                      Any Format
+                    </p>
+                  </div>
+
+                  {/* Arrow */}
+                  <div className="flex flex-col items-center">
+                    <svg
+                      className="w-8 h-8 text-primary animate-pulse"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 7l5 5m0 0l-5 5m5-5H6"
+                      />
+                    </svg>
+                    <span className="text-xs text-light-gray mt-1">
+                      Convert
+                    </span>
+                  </div>
+
+                  {/* Output */}
+                  <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 transform hover:scale-105 transition-transform">
+                    <div className="w-32 h-40 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex flex-col items-center justify-center text-white font-mono text-xs p-3">
+                      <div className="text-green-400 mb-1"># Heading</div>
+                      <div className="text-gray-400 text-[10px]">
+                        Lorem ipsum...
+                      </div>
+                      <div className="text-blue-400 mt-2 text-[10px]">
+                        ![image]()
+                      </div>
+                    </div>
+                    <p className="text-center text-xs text-light-gray mt-3">
+                      Markdown
+                    </p>
+                  </div>
+                </div>
+
+                {/* Output files indicator */}
+                <div className="mt-6 flex justify-center gap-3">
+                  <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                    📄 .md
+                  </span>
+                  <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium">
+                    📋 .yml
+                  </span>
+                  <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
+                    🖼️ images
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

@@ -8,11 +8,8 @@ import { postProcess } from './markdownPostProcessor'
  * Note: Works best with text-based PDFs. Scanned/image PDFs require OCR (not supported client-side).
  */
 
-// Point worker to the bundled version
-pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.mjs',
-  import.meta.url
-).toString()
+// Use CDN worker for compatibility
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`
 
 async function animateProgress(onProgress, step, fromPercent, toPercent, message, duration = 300) {
   const steps = 10
